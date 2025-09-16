@@ -1,5 +1,7 @@
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import { Box, Button, Heading, Input, Text, Stack } from "@chakra-ui/react";
+import { addWord } from "./firebase/helpers";
+import { messaging, getToken, onMessage } from "./firebase/messaging";
 
 const App: React.FC = () => {
   const [word, setWord] = useState<string>("");
@@ -9,11 +11,77 @@ const App: React.FC = () => {
     setWord(e.target.value);
   };
 
-  const handleAddWord = () => {
+  const handleAddWord = async () => {
     if (word.trim() === "") return;
-    setWords([...words, word.trim()]);
+    setWords((prev) => [...prev, word.trim()]);
+
+    try {
+      await addWord(word.trim());
+    } catch (err) {
+      console.error("Firestore error:", err);
+    }
     setWord("");
   };
+
+  // Bildirim fonksiyonu
+  const notifyMe = async () => {
+    if (!("Notification" in window)) {
+      alert("Tarayıcı bildirimleri desteklemiyor.");
+      return;
+    }
+
+    if (Notification.permission === "granted") {
+      new Notification("Hi there!");
+    } else if (Notification.permission !== "denied") {
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") new Notification("Hi there!");
+    }
+  };
+
+  useEffect(() => {
+    const registerSWAndGetToken = async () => {
+      if (!("serviceWorker" in navigator)) return;
+
+      try {
+        const registration = await navigator.serviceWorker.register(
+          "/firebase-messaging-sw.js"
+        );
+        console.log("Service Worker registered:", registration);
+
+        // Notification izni al
+        await notifyMe();
+
+        // Token al
+        let token;
+        try {
+          const swReady = await navigator.serviceWorker.ready;
+          token = await getToken(messaging, {
+            vapidKey:
+              "BLL5c70rr3MSZ-6MYMUukcHAmWpzDK-PM7_TqKwbS5g2pM2R2JkvjyRevTKwvArU_4z9bKq8oZ8oYBY78CE2lY4",
+            serviceWorkerRegistration: swReady,
+          });
+        } catch (err) {
+          console.warn("PushManager erişilemedi veya token alınamadı:", err);
+        }
+
+        if (token) console.log("FCM Token:", token);
+
+        // Mesajları dinle
+        onMessage(messaging, (payload) => {
+          console.log("Mesaj geldi:", payload);
+          alert(
+            `${payload.notification?.title || "Bildirim"} - ${
+              payload.notification?.body || ""
+            }`
+          );
+        });
+      } catch (err) {
+        console.error("SW veya Token hatası:", err);
+      }
+    };
+
+    registerSWAndGetToken();
+  }, []);
 
   return (
     <Box
@@ -25,7 +93,7 @@ const App: React.FC = () => {
       justifyContent="center"
       px={4}
     >
-      <Stackçok komik amk
+      <Stack
         spacing={6}
         align="center"
         w="100%"
@@ -35,25 +103,22 @@ const App: React.FC = () => {
         borderRadius="2xl"
         boxShadow="2xl"
       >
-        <Heading size="xl" color="teal.600" textAlign="center">
+        <Heading size="xl" color="teal.600">
           Word Pop
         </Heading>
-
-        <Text fontSize="lg" color="gray.600" textAlign="center">
-          Yeni kelime ekle:
-        </Text>
 
         <Input
           placeholder="Kelime yazın..."
           value={word}
           onChange={handleInputChange}
-          bg="gray.100"
-          borderColor="teal.200"
-          focusBorderColor="teal.400"
         />
 
         <Button colorScheme="teal" w="100%" onClick={handleAddWord}>
           Ekle
+        </Button>
+
+        <Button colorScheme="purple" w="100%" onClick={notifyMe}>
+          Bildirim Göster
         </Button>
 
         <Box w="100%">
@@ -68,16 +133,14 @@ const App: React.FC = () => {
                 borderWidth={1}
                 borderRadius="lg"
                 bg="teal.50"
-                borderColor="teal.200"
                 color="teal.700"
-                fontWeight="medium"
               >
                 {w}
               </Box>
             ))}
           </Stack>
         </Box>
-      </Stackçok>
+      </Stack>
     </Box>
   );
 };
