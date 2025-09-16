@@ -1,35 +1,85 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, ChangeEvent } from "react";
+import { Box, Button, Heading, Input, Text, Stack } from "@chakra-ui/react";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App: React.FC = () => {
+  const [word, setWord] = useState<string>("");
+  const [words, setWords] = useState<string[]>([]);
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setWord(e.target.value);
+  };
+
+  const handleAddWord = () => {
+    if (word.trim() === "") return;
+    setWords([...words, word.trim()]);
+    setWord("");
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Box
+      minH="100vh"
+      w="100vw"
+      bg="gray.50"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      px={4}
+    >
+      <Stackçok komik amk
+        spacing={6}
+        align="center"
+        w="100%"
+        maxW="700px"
+        bg="white"
+        p={10}
+        borderRadius="2xl"
+        boxShadow="2xl"
+      >
+        <Heading size="xl" color="teal.600" textAlign="center">
+          Word Pop
+        </Heading>
 
-export default App
+        <Text fontSize="lg" color="gray.600" textAlign="center">
+          Yeni kelime ekle:
+        </Text>
+
+        <Input
+          placeholder="Kelime yazın..."
+          value={word}
+          onChange={handleInputChange}
+          bg="gray.100"
+          borderColor="teal.200"
+          focusBorderColor="teal.400"
+        />
+
+        <Button colorScheme="teal" w="100%" onClick={handleAddWord}>
+          Ekle
+        </Button>
+
+        <Box w="100%">
+          <Text fontWeight="bold" mb={3} color="purple.600">
+            Kelime Listesi:
+          </Text>
+          <Stack spacing={3}>
+            {words.map((w, index) => (
+              <Box
+                key={index}
+                p={3}
+                borderWidth={1}
+                borderRadius="lg"
+                bg="teal.50"
+                borderColor="teal.200"
+                color="teal.700"
+                fontWeight="medium"
+              >
+                {w}
+              </Box>
+            ))}
+          </Stack>
+        </Box>
+      </Stackçok>
+    </Box>
+  );
+};
+
+export default App;
