@@ -419,6 +419,22 @@ export const Settings = () => {
                  <div style={{ fontSize: '12px', color: '#F57C00', marginTop: '8px' }}>
                    Bildirim izni ve görünürlük testi için kullanın
                  </div>
+                 
+                 {/* Mac için özel uyarı */}
+                 <div style={{
+                   marginTop: '12px',
+                   padding: '8px',
+                   backgroundColor: '#E3F2FD',
+                   borderRadius: '4px',
+                   border: '1px solid #2196F3',
+                   fontSize: '11px',
+                   color: '#1976D2'
+                 }}>
+                   <strong>Mac Kullanıcıları:</strong><br/>
+                   • Sistem Ayarları → Bildirimler → Tarayıcı izni<br/>
+                   • Denetim Merkezi → Odak → Rahatsız Etmeyin KAPALI<br/>
+                   • Tarayıcı ayarlarında localhost:5173 izni
+                 </div>
                </div>
 
                {/* Butonlar */}

@@ -266,7 +266,9 @@ export class NotificationService {
         badge: '/vite.svg',
         tag: `word-${word.id}`,
         requireInteraction: true, // Kullanıcı etkileşimi gereksin - daha görünür
-        silent: false // Ses çıkarsın
+        silent: false, // Ses çıkarsın
+        dir: 'ltr', // Mac'te daha iyi görünüm için
+        lang: 'tr' // Türkçe dil desteği
       })
 
       console.log(`✅ "${word.word}" bildirimi başarıyla oluşturuldu!`)
